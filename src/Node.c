@@ -1,27 +1,19 @@
 #include "Node.h"
 #include <stdlib.h>
-
-Tree *initiallizeTree(){
-  Tree *tree=malloc(sizeof(Tree));
-  
-  tree->head=NULL;
-  tree->length=0;
-  
-  return tree;
-}
+#include <stdio.h>
   
 Node *createNode(Node *leftData,int root,Node *rightData){
   Node *node=malloc(sizeof(Node));
   
   node->left=leftData;
   node->right=rightData;
-  node->weight=0;
+  node->balanceFactor=0;
   node->data=root;
   
   return node;
 }
 
-Tree *createTree(Tree *tree){
+Node *createTree(){
   
   Node *node_20=createNode(NULL,20,NULL);
   Node *node_30=createNode(node_20,30,NULL);
@@ -34,8 +26,5 @@ Tree *createTree(Tree *tree){
   Node *node_110=createNode(node_80,110,node_150);
   Node *node_60=createNode(node_30,60,node_110);
     
-  tree->head=node_60;
-  
-  return tree;
-
+  return node_60;
 }

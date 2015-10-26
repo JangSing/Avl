@@ -2,45 +2,64 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void leftRotation(Tree *tree,Node *pivotNode){
+// void leftRotation(Tree *tree,Node *pivotNode){
+  // Node *tempNode;
+  
+  // tempNode=pivotNode->right;
+  
+  // pivotNode->right=tempNode->left;
+  // tempNode->left=pivotNode;
+  
+  // tree->head=tempNode;
+  
+// }
+
+Node *leftRotation(Node *head){
   Node *tempNode;
   
-  tempNode=pivotNode->right;
+  tempNode=head->right;
   
-  pivotNode->right=tempNode->left;
-  tempNode->left=pivotNode;
+  head->right=tempNode->left;
+  tempNode->left=head;
   
-  tree->head=tempNode;
+  head=tempNode;
   
+  return head;
 }
 
-void rightRotation(Tree *tree,Node *pivotNode){
+Node *rightRotation(Node *head){
   Node *tempNode;
   
-  tempNode=pivotNode->left;
+  tempNode=head->left;
   
-  pivotNode->left=tempNode->right;
-  tempNode->right=pivotNode;
+  head->left=tempNode->right;
+  tempNode->right=head;
   
-  tree->head=tempNode;
+  head=tempNode;
+  
+  return head;
 }
 
-void leftRightRotation(Tree *tree,Node *pivotNode1,Node *pivotNode2){
-  Tree *tempTree;
-  tempTree->head=pivotNode2;
-  leftRotation(tempTree,pivotNode2);
-  tree->head->left=tempTree->head;
-  rightRotation(tree,pivotNode1);
+Node *leftRightRotation(Node *head){  
+  Node *tempTree;
+  tempTree=head->left;
+  tempTree=leftRotation(tempTree);
+  head->left=tempTree;
+  head=rightRotation(head);
   
+  return head;
   free(tempTree);
 }
 
-void rightLeftRotation(Tree *tree,Node *pivotNode1,Node *pivotNode2){  
-  Tree *tempTree;
-  tempTree->head=pivotNode2;
-  rightRotation(tempTree,pivotNode2);
-  tree->head->right=tempTree->head;
-  leftRotation(tree,pivotNode1);
+Node *rightLeftRotation(Node *head){  
+  Node *tempTree;
+  tempTree=head->right;
+  tempTree=rightRotation(tempTree);
+  head->right=tempTree;
+  head=leftRotation(head);
   
+  return head;
   free(tempTree);
 }
+
+

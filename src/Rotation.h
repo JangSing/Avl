@@ -3,12 +3,12 @@
 
 #include "Node.h"
 
-void leftRotation(Tree *tree,Node *pivotNode);
+Node *leftRotation(Node *head);
 
-void rightRotation(Tree *tree,Node *pivotNode);
+Node *rightRotation(Node *head);
 
-void leftRightRotation(Tree *tree,Node *pivotNode1,Node *pivotNode2);
+Node *leftRightRotation(Node *head);
 
-void rightLeftRotation(Tree *tree,Node *pivotNode1,Node *pivotNode2);
+Node *rightLeftRotation(Node *head);
 
 #endif // Rotation_H
