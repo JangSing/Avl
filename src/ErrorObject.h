@@ -4,7 +4,8 @@
 #include <stdarg.h>
 
 typedef enum {
-  ERR_REPEATED_NODE
+  ERR_REPEATED_NODE,
+  ERR_NULL_NODE
 }ErrorCode;
 
 typedef struct{

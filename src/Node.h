@@ -9,8 +9,4 @@ struct Node_t{
   int data;
 };
 
-Node *createNode(Node *leftData,int root,Node *rightData);
-
-Node *createTree();
-
 #endif // Node_H
