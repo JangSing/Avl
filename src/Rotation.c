@@ -2,18 +2,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// void leftRotation(Tree *tree,Node *pivotNode){
-  // Node *tempNode;
-  
-  // tempNode=pivotNode->right;
-  
-  // pivotNode->right=tempNode->left;
-  // tempNode->left=pivotNode;
-  
-  // tree->head=tempNode;
-  
-// }
-
 Node *leftRotation(Node *head){
   Node *tempNode;
   
