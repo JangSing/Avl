@@ -265,13 +265,56 @@ void test_condition_Balance_factor_2_1_1()
 }
 
 /**
+ *                   100                           60
+ *                  /   \                         /  \
+ *                60    110                     40    100
+ *               /  \     \                    / \    / \
+ *             40   80     120     =>        30  50  80 110
+ *            / \   /                       /       /     \
+ *          30  50 70                     20       70     120
+ *         /
+ *        20
+ */
+void test_condition_Balance_factor_minus_2_minus_1_minus_1()
+{
+  Node *head;
+
+  head=node100;
+  avlAdd(&head,node110);
+  avlAdd(&head,node60);
+  avlAdd(&head,node120);
+  avlAdd(&head,node80);
+  avlAdd(&head,node40);
+  avlAdd(&head,node70);
+  avlAdd(&head,node50);
+  avlAdd(&head,node30);
+  avlAdd(&head,node20);
+
+  TEST_ASSERT_EQUAL_PTR(node60,head);
+  TEST_ASSERT_EQUAL_PTR(node40,head->left);
+  TEST_ASSERT_EQUAL_PTR(node30,head->left->left);
+  TEST_ASSERT_EQUAL_PTR(node50,head->left->right);
+  TEST_ASSERT_EQUAL_PTR(node20,head->left->left->left);
+
+  TEST_ASSERT_EQUAL_PTR(node100,head->right);
+  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
+  TEST_ASSERT_EQUAL_PTR(node110,head->right->right);
+  TEST_ASSERT_EQUAL_PTR(node70,head->right->left->left);
+  TEST_ASSERT_EQUAL_PTR(node120,head->right->right->right);
+
+  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+
+}
+
+
+/**
  *               30                                   90
  *             /    \                               /    \
  *           20      90                           30      110
- *         /        /  \                         / \     /  \
+ *         /        /  \                         / \     /   \
  *       10       70    110        =>           20  70  100  120
- *               /      / \                    /    /         \
- *             60     100 120                10   60          130
+ *               /      / \                    /    /          \
+ *             60     100 120                10   60           130
  *                          \
  *                          130
  */
@@ -310,13 +353,54 @@ void test_condition_Balance_factor_2_minus_1_1()
 }
 
 /**
+ *                  100                                    60
+ *                /    \                                 /   \
+ *              60     110                             40    100
+ *             /  \       \                           / \    /  \
+ *           40    80     120      =>               30  50  80  110
+ *          /  \    \                              /         \    \
+ *         30  50   90                           20          90   120
+ *        /
+ *       20
+ */
+void test_condition_Balance_factor_minus_2_1_minus_1()
+{
+  Node *head;
+
+  head=node100;
+  avlAdd(&head,node110);
+  avlAdd(&head,node60);
+  avlAdd(&head,node120);
+  avlAdd(&head,node80);
+  avlAdd(&head,node40);
+  avlAdd(&head,node90);
+  avlAdd(&head,node50);
+  avlAdd(&head,node30);
+  avlAdd(&head,node20);
+
+  TEST_ASSERT_EQUAL_PTR(node60,head);
+  TEST_ASSERT_EQUAL_PTR(node40,head->left);
+  TEST_ASSERT_EQUAL_PTR(node30,head->left->left);
+  TEST_ASSERT_EQUAL_PTR(node50,head->left->right);
+  TEST_ASSERT_EQUAL_PTR(node20,head->left->left->left);
+
+  TEST_ASSERT_EQUAL_PTR(node100,head->right);
+  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
+  TEST_ASSERT_EQUAL_PTR(node110,head->right->right);
+  TEST_ASSERT_EQUAL_PTR(node90,head->right->left->right);
+  TEST_ASSERT_EQUAL_PTR(node120,head->right->right->right);
+
+  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+}
+
+/**
  *               30                                   60
  *             /    \                               /    \
  *           20      90                           30      90
  *         /        /   \                        / \     /  \
  *       10       60     140        =>         20  50   80  140
- *               / \    /                     /    /        /
- *             50  80 120                   10    40      120
+ *               / \     /                     /    /        /
+ *             50  80  120                   10    40      120
  *            /
  *           40
  */
@@ -354,6 +438,49 @@ void test_double_rotation_Balance_Factor_2_minus_1_minus_1()
   TEST_ASSERT_EQUAL(1,head->right->balanceFactor);
   TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
 }
+
+/**
+ *                100                                 60
+ *               /   \                              /   \
+ *              40   110                          40    100
+ *             /  \     \                        / \    /  \
+ *           20   60    120        =>          20  50  70  110
+ *            \   / \                           \       \    \
+ *            30 50 70                          30      80   120
+ *                   \
+ *                   80
+ */
+void test_double_rotation_Balance_Factor_minus_2_1_1()
+{
+  Node *head;
+
+  head=node100;
+  avlAdd(&head,node110);
+  avlAdd(&head,node40);
+  avlAdd(&head,node120);
+  avlAdd(&head,node60);
+  avlAdd(&head,node20);
+  avlAdd(&head,node70);
+  avlAdd(&head,node50);
+  avlAdd(&head,node30);
+  avlAdd(&head,node80);
+
+  TEST_ASSERT_EQUAL_PTR(node60,head);
+  TEST_ASSERT_EQUAL_PTR(node40,head->left);
+  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
+  TEST_ASSERT_EQUAL_PTR(node50,head->left->right);
+  TEST_ASSERT_EQUAL_PTR(node30,head->left->left->right);
+
+  TEST_ASSERT_EQUAL_PTR(node100,head->right);
+  TEST_ASSERT_EQUAL_PTR(node70,head->right->left);
+  TEST_ASSERT_EQUAL_PTR(node110,head->right->right);
+  TEST_ASSERT_EQUAL_PTR(node80,head->right->left->right);
+  TEST_ASSERT_EQUAL_PTR(node120,head->right->right->right);
+
+  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+
+}
+
 
 /**
  *          60                    80
@@ -431,6 +558,37 @@ void test_double_rotation_Balance_Factor_minus_2_1_minus_1()
   TEST_ASSERT_EQUAL_PTR(node90,head->right);
   TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
   TEST_ASSERT_EQUAL_PTR(node100,head->right->right);
+  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+}
+
+/**
+ *             90                      60
+ *            /  \                    /  \
+ *          40   100                40    90
+ *         / \            =>       /  \    \
+ *       30  60                  30   50   100
+ *           /
+ *          50
+ */
+void test_double_rotation_Balance_Factor_minus_2_minus_1_1()
+{
+  Node *head;
+
+  head=node90;
+  avlAdd(&head,node100);
+  avlAdd(&head,node40);
+  avlAdd(&head,node60);
+  avlAdd(&head,node30);
+  avlAdd(&head,node50);
+
+  TEST_ASSERT_EQUAL_PTR(node60,head);
+  TEST_ASSERT_EQUAL_PTR(node40,head->left);
+  TEST_ASSERT_EQUAL_PTR(node30,head->left->left);
+  TEST_ASSERT_EQUAL_PTR(node50,head->left->right);
+
+  TEST_ASSERT_EQUAL_PTR(node90,head->right);
+  TEST_ASSERT_EQUAL_PTR(node100,head->right->right);
+
   TEST_ASSERT_EQUAL(0,head->balanceFactor);
 }
 
