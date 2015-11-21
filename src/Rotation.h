@@ -11,4 +11,6 @@ Node *leftRightRotation(Node *head);
 
 Node *rightLeftRotation(Node *head);
 
+void checkForRotation(Node **rootPtr,int *heightChange);
+
 #endif // Rotation_H

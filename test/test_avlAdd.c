@@ -1,5 +1,5 @@
 #include "unity.h"
-#include "Avl.h"
+#include "avlAdd.h"
 #include "Node.h"
 #include "Rotation.h"
 #include "ErrorObject.h"
@@ -34,6 +34,11 @@ void setUp(void){
   node120=resetNode(120);
   node130=resetNode(130);
   node140=resetNode(140);
+  node150=resetNode(150);
+  node160=resetNode(160);
+  node170=resetNode(170);
+  node180=resetNode(180);
+  node190=resetNode(190);
 }
 
 void tearDown()
@@ -593,3 +598,113 @@ void test_double_rotation_Balance_Factor_minus_2_minus_1_1()
 }
 
 
+/**
+ *
+ *                     50
+ *                   /    \
+ *                 30      90
+ *                / \     / \
+ *              20  40  80  130
+ *             /       /   /   \
+ *           10      70  100   150
+ *                        \     /
+ *                        110  140
+ *
+ */
+void test_avlAdd_by_adding_more_data_data_to_the_avl_tree(void)
+{
+  Node *head,*removeNode;
+  int heightChange=0;
+
+  head=node50;
+  avlAdd(&head,node30);
+  avlAdd(&head,node90);
+  avlAdd(&head,node20);
+  avlAdd(&head,node40);
+  avlAdd(&head,node80);
+  avlAdd(&head,node130);
+  avlAdd(&head,node10);
+  avlAdd(&head,node70);
+  avlAdd(&head,node100);
+  avlAdd(&head,node150);
+  avlAdd(&head,node110);
+  avlAdd(&head,node140);
+
+  TEST_ASSERT_EQUAL_PTR(node50,head);
+
+  TEST_ASSERT_EQUAL_PTR(node30,head->left);
+  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
+  TEST_ASSERT_EQUAL_PTR(node40,head->left->right);
+  TEST_ASSERT_EQUAL_PTR(node10,head->left->left->left);
+
+  TEST_ASSERT_EQUAL_PTR(node90,head->right);
+  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
+  TEST_ASSERT_EQUAL_PTR(node70,head->right->left->left);
+
+  TEST_ASSERT_EQUAL_PTR(node130,head->right->right);
+  TEST_ASSERT_EQUAL_PTR(node100,head->right->right->left);
+  TEST_ASSERT_EQUAL_PTR(node150,head->right->right->right);
+
+  TEST_ASSERT_EQUAL_PTR(node140,head->right->right->right->left);
+  TEST_ASSERT_EQUAL_PTR(node110,head->right->right->left->right);
+
+  TEST_ASSERT_EQUAL(1,head->balanceFactor);
+  TEST_ASSERT_EQUAL(-1,head->left->balanceFactor);
+  TEST_ASSERT_EQUAL(1,head->right->balanceFactor);
+  TEST_ASSERT_EQUAL(-1,head->right->left->balanceFactor);
+  TEST_ASSERT_EQUAL(0,head->right->right->balanceFactor);
+  TEST_ASSERT_EQUAL(-1,head->right->right->right->balanceFactor);
+  TEST_ASSERT_EQUAL(1,head->right->right->left->balanceFactor);
+}
+
+/**
+ *
+ *                     50
+ *                   /    \
+ *                 30      90
+ *                / \     / \
+ *              20  40  80  130
+ *             /       /       \
+ *           10      70        150
+ *                             /
+ *                            140
+ *
+ */
+void test_avlAdd_by_adding_more_data_data_to_the_avl_tree1(void)
+{
+  Node *head,*removeNode;
+  int heightChange=0;
+
+  head=node50;
+  avlAdd(&head,node30);
+  avlAdd(&head,node90);
+  avlAdd(&head,node20);
+  avlAdd(&head,node40);
+  avlAdd(&head,node80);
+  avlAdd(&head,node130);
+  avlAdd(&head,node10);
+  avlAdd(&head,node70);
+  avlAdd(&head,node150);
+  avlAdd(&head,node140);
+
+  TEST_ASSERT_EQUAL_PTR(node50,head);
+
+  TEST_ASSERT_EQUAL_PTR(node30,head->left);
+  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
+  TEST_ASSERT_EQUAL_PTR(node40,head->left->right);
+  TEST_ASSERT_EQUAL_PTR(node10,head->left->left->left);
+
+  TEST_ASSERT_EQUAL_PTR(node90,head->right);
+  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
+  TEST_ASSERT_EQUAL_PTR(node70,head->right->left->left);
+
+  TEST_ASSERT_EQUAL_PTR(node140,head->right->right);
+  TEST_ASSERT_EQUAL_PTR(node130,head->right->right->left);
+  TEST_ASSERT_EQUAL_PTR(node150,head->right->right->right);
+
+  // TEST_ASSERT_EQUAL_PTR(node140,head->right->right->right->left);
+  // TEST_ASSERT_EQUAL_PTR(node110,head->right->right->left->right);
+
+
+
+}

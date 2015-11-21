@@ -4,6 +4,6 @@
 
 int avlAdd(Node **rootPtr,Node *newNode);
 
-int avlRemove(Node **rootPtr,int data);
+
 
 #endif // Avl_H
