@@ -4,6 +4,7 @@
 #include "Rotation.h"
 #include "ErrorObject.h"
 #include "CException.h"
+#include "CustomAssertion.h"
 #include <stdlib.h>
 
 Node  *node10, *node20, *node30, *node40, *node50, *node60, *node70, *node80, *node90;
@@ -75,9 +76,13 @@ void test_function_avlAdd_given_only_one_node_added_at_right_Balance_Factor_shou
 
   avlAdd(&head,node40);
 
-  TEST_ASSERT_EQUAL_PTR(node20,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->right);
-  TEST_ASSERT_EQUAL(1,head->balanceFactor);
+  //test Node ptr
+  TEST_ASSERT_ROOT(NULL   ,20   ,node40   ,node20);
+  TEST_ASSERT_ROOT(NULL   ,40   ,NULL     ,node40);
+
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(1   ,node20);
+  TEST_ASSERT_BALANCE(0   ,node40);
 }
 
 /**
@@ -93,9 +98,13 @@ void test_function_avlAdd_given_only_one_node_added_at_left_Balance_Factor_shoul
 
   avlAdd(&head,node10);
 
-  TEST_ASSERT_EQUAL_PTR(node20,head);
-  TEST_ASSERT_EQUAL_PTR(node10,head->left);
-  TEST_ASSERT_EQUAL(-1,head->balanceFactor);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node10   ,20   ,NULL   ,node20);
+  TEST_ASSERT_ROOT(NULL     ,10   ,NULL   ,node10);
+
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(-1    ,node20);
+  TEST_ASSERT_BALANCE(0     ,node10);
 }
 
 /**
@@ -112,10 +121,15 @@ void test_function_avlAdd_given_Node_add_into_tree_at_right_if_left_node_not_NUL
   avlAdd(&head,node10);
   avlAdd(&head,node40);
 
-  TEST_ASSERT_EQUAL_PTR(node20,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->right);
-  TEST_ASSERT_EQUAL_PTR(node10,head->left);
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node10   ,20   ,node40   ,node20);
+  TEST_ASSERT_ROOT(NULL     ,10   ,NULL     ,node10);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL     ,node40);
+
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node20);
+  TEST_ASSERT_BALANCE(0   ,node10);
+  TEST_ASSERT_BALANCE(0   ,node40);
 }
 
 /**
@@ -132,10 +146,15 @@ void test_function_avlAdd_given_Node_add_into_tree_at_left_if_right_node_not_NUL
   avlAdd(&head,node30);
   avlAdd(&head,node10);
 
-  TEST_ASSERT_EQUAL_PTR(node20,head);
-  TEST_ASSERT_EQUAL_PTR(node10,head->left);
-  TEST_ASSERT_EQUAL_PTR(node30,head->right);
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node10   ,20   ,node30 ,node20);
+  TEST_ASSERT_ROOT(NULL     ,10   ,NULL   ,node10);
+  TEST_ASSERT_ROOT(NULL     ,30   ,NULL   ,node30);
+
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node20);
+  TEST_ASSERT_BALANCE(0   ,node10);
+  TEST_ASSERT_BALANCE(0   ,node30);
 
   free(head);
 }
@@ -163,17 +182,25 @@ void test_function_avlAdd_for_more_data_will_modify_Balance_Factor_correctly()
   avlAdd(&head,node100);
 
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30   ,60     ,node80   ,node60);
+  TEST_ASSERT_ROOT(node20   ,30     ,node40   ,node30);
+  TEST_ASSERT_ROOT(NULL     ,20     ,NULL     ,node20);
+  TEST_ASSERT_ROOT(NULL     ,40     ,NULL     ,node40);
+  TEST_ASSERT_ROOT(node70   ,80     ,node90   ,node80);
+  TEST_ASSERT_ROOT(NULL     ,70     ,NULL     ,node70);
+  TEST_ASSERT_ROOT(NULL     ,90     ,node100  ,node90);
+  TEST_ASSERT_ROOT(NULL     ,100    ,NULL     ,node100);
 
-  TEST_ASSERT_EQUAL_PTR(node80,head->right);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node90,head->right->right);
-  TEST_ASSERT_EQUAL_PTR(node100,head->right->right->right);
-
-  TEST_ASSERT_EQUAL(1,head->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(1   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node30);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node20);
+  TEST_ASSERT_BALANCE(1   ,node80);
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(1   ,node90);
+  TEST_ASSERT_BALANCE(0   ,node100);
 }
 
 /**
@@ -192,12 +219,15 @@ void test_condition_Balance_factor_2_0_1()
   avlAdd(&head,node90);
   avlAdd(&head,node100);
 
-  TEST_ASSERT_EQUAL_PTR(node90,head);
-  TEST_ASSERT_EQUAL_PTR(node60,head->left);
-  TEST_ASSERT_EQUAL_PTR(node100,head->right);
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node60   ,90   ,node100    ,node90);
+  TEST_ASSERT_ROOT(NULL     ,60   ,NULL       ,node60);
+  TEST_ASSERT_ROOT(NULL     ,100  ,NULL       ,node100);
+
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node90);
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node100);
 }
 
 /**
@@ -216,12 +246,15 @@ void test_condition_Balance_factor_minus_2_0_minus_1()
   avlAdd(&head,node50);
   avlAdd(&head,node40);
 
-  TEST_ASSERT_EQUAL_PTR(node50,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node60,head->right);
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,50   ,node60   ,node50);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(NULL     ,60   ,NULL     ,node60);
+
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0     ,node50);
+  TEST_ASSERT_BALANCE(0     ,node40);
+  TEST_ASSERT_BALANCE(0     ,node60);
 }
 
 /**
@@ -250,23 +283,29 @@ void test_condition_Balance_factor_2_1_1()
   avlAdd(&head,node120);
   avlAdd(&head,node130);
 
-  TEST_ASSERT_EQUAL_PTR(node90,head);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30   ,90   ,node110  ,node90);
+  TEST_ASSERT_ROOT(node20   ,30   ,node70   ,node30);
+  TEST_ASSERT_ROOT(node10   ,20   ,NULL     ,node20);
+  TEST_ASSERT_ROOT(NULL     ,10   ,NULL     ,node10);
+  TEST_ASSERT_ROOT(NULL     ,70   ,node80   ,node70);
+  TEST_ASSERT_ROOT(NULL     ,80   ,NULL     ,node80);
+  TEST_ASSERT_ROOT(node100  ,110  ,node120  ,node110);
+  TEST_ASSERT_ROOT(NULL     ,100  ,NULL     ,node100);
+  TEST_ASSERT_ROOT(NULL     ,120  ,node130  ,node120);
+  TEST_ASSERT_ROOT(NULL     ,130  ,NULL     ,node130);
 
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node70,head->left->right);
-
-  TEST_ASSERT_EQUAL_PTR(node10,head->left->left->left);
-  TEST_ASSERT_EQUAL_PTR(node80,head->left->right->right);
-
-  TEST_ASSERT_EQUAL_PTR(node110,head->right);
-
-  TEST_ASSERT_EQUAL_PTR(node100,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node120,head->right->right);
-
-  TEST_ASSERT_EQUAL_PTR(node130,head->right->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node90);
+  TEST_ASSERT_BALANCE(0   ,node30);
+  TEST_ASSERT_BALANCE(-1  ,node20);
+  TEST_ASSERT_BALANCE(0   ,node10);
+  TEST_ASSERT_BALANCE(1   ,node70);
+  TEST_ASSERT_BALANCE(0   ,node80);
+  TEST_ASSERT_BALANCE(1   ,node110);
+  TEST_ASSERT_BALANCE(0   ,node100);
+  TEST_ASSERT_BALANCE(1   ,node120);
+  TEST_ASSERT_BALANCE(0   ,node130);
 }
 
 /**
@@ -295,19 +334,29 @@ void test_condition_Balance_factor_minus_2_minus_1_minus_1()
   avlAdd(&head,node30);
   avlAdd(&head,node20);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node50,head->left->right);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left->left);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40     ,60     ,node100  ,node60);
+  TEST_ASSERT_ROOT(node30     ,40     ,node50   ,node40);
+  TEST_ASSERT_ROOT(node20     ,30     ,NULL     ,node30);
+  TEST_ASSERT_ROOT(NULL       ,20     ,NULL     ,node20);
+  TEST_ASSERT_ROOT(NULL       ,50     ,NULL     ,node50);
+  TEST_ASSERT_ROOT(node80     ,100    ,node110  ,node100);
+  TEST_ASSERT_ROOT(node70     ,80     ,NULL     ,node80);
+  TEST_ASSERT_ROOT(NULL       ,70     ,NULL     ,node70);
+  TEST_ASSERT_ROOT(NULL       ,110    ,node120  ,node110);
+  TEST_ASSERT_ROOT(NULL       ,120    ,NULL     ,node120);
 
-  TEST_ASSERT_EQUAL_PTR(node100,head->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node110,head->right->right);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right->left->left);
-  TEST_ASSERT_EQUAL_PTR(node120,head->right->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(-1  ,node40);
+  TEST_ASSERT_BALANCE(-1  ,node30);
+  TEST_ASSERT_BALANCE(0   ,node20);
+  TEST_ASSERT_BALANCE(0   ,node50);
+  TEST_ASSERT_BALANCE(0   ,node100);
+  TEST_ASSERT_BALANCE(-1  ,node80);
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(1   ,node110);
+  TEST_ASSERT_BALANCE(0   ,node120);
 
 }
 
@@ -338,23 +387,29 @@ void test_condition_Balance_factor_2_minus_1_1()
   avlAdd(&head,node120);
   avlAdd(&head,node130);
 
-  TEST_ASSERT_EQUAL_PTR(node90,head);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30     ,90   ,node110  ,node90);
+  TEST_ASSERT_ROOT(node20     ,30   ,node70   ,node30);
+  TEST_ASSERT_ROOT(node10     ,20   ,NULL     ,node20);
+  TEST_ASSERT_ROOT(NULL       ,10   ,NULL     ,node10);
+  TEST_ASSERT_ROOT(node60     ,70   ,NULL     ,node70);
+  TEST_ASSERT_ROOT(NULL       ,60   ,NULL     ,node60);
+  TEST_ASSERT_ROOT(node100    ,110  ,node120  ,node110);
+  TEST_ASSERT_ROOT(NULL       ,100  ,NULL     ,node100);
+  TEST_ASSERT_ROOT(NULL       ,120  ,node130  ,node120);
+  TEST_ASSERT_ROOT(NULL       ,130  ,NULL     ,node130);
 
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node70,head->left->right);
-
-  TEST_ASSERT_EQUAL_PTR(node10,head->left->left->left);
-  TEST_ASSERT_EQUAL_PTR(node60,head->left->right->left);
-
-  TEST_ASSERT_EQUAL_PTR(node110,head->right);
-
-  TEST_ASSERT_EQUAL_PTR(node100,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node120,head->right->right);
-
-  TEST_ASSERT_EQUAL_PTR(node130,head->right->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node90);
+  TEST_ASSERT_BALANCE(0   ,node30);
+  TEST_ASSERT_BALANCE(-1  ,node20);
+  TEST_ASSERT_BALANCE(0   ,node10);
+  TEST_ASSERT_BALANCE(-1  ,node70);
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(1   ,node110);
+  TEST_ASSERT_BALANCE(0   ,node100);
+  TEST_ASSERT_BALANCE(1   ,node120);
+  TEST_ASSERT_BALANCE(0   ,node130);
 }
 
 /**
@@ -383,19 +438,29 @@ void test_condition_Balance_factor_minus_2_1_minus_1()
   avlAdd(&head,node30);
   avlAdd(&head,node20);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node50,head->left->right);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left->left);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,60    ,node100  ,node60);
+  TEST_ASSERT_ROOT(node30   ,40    ,node50   ,node40);
+  TEST_ASSERT_ROOT(node20   ,30    ,NULL     ,node30);
+  TEST_ASSERT_ROOT(NULL     ,20    ,NULL     ,node20);
+  TEST_ASSERT_ROOT(NULL     ,50    ,NULL     ,node50);
+  TEST_ASSERT_ROOT(node80   ,100   ,node110  ,node100);
+  TEST_ASSERT_ROOT(NULL     ,80    ,node90   ,node80);
+  TEST_ASSERT_ROOT(NULL     ,90    ,NULL     ,node90);
+  TEST_ASSERT_ROOT(NULL     ,110   ,node120  ,node110);
+  TEST_ASSERT_ROOT(NULL     ,120   ,NULL     ,node120);
 
-  TEST_ASSERT_EQUAL_PTR(node100,head->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node110,head->right->right);
-  TEST_ASSERT_EQUAL_PTR(node90,head->right->left->right);
-  TEST_ASSERT_EQUAL_PTR(node120,head->right->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(-1  ,node40);
+  TEST_ASSERT_BALANCE(-1  ,node30);
+  TEST_ASSERT_BALANCE(0   ,node20);
+  TEST_ASSERT_BALANCE(0   ,node50);
+  TEST_ASSERT_BALANCE(0   ,node100);
+  TEST_ASSERT_BALANCE(1   ,node80);
+  TEST_ASSERT_BALANCE(0   ,node90);
+  TEST_ASSERT_BALANCE(1   ,node110);
+  TEST_ASSERT_BALANCE(0   ,node120);
 }
 
 /**
@@ -426,22 +491,29 @@ void test_double_rotation_Balance_Factor_2_minus_1_minus_1()
 
   TEST_ASSERT_EQUAL_PTR(node60,head);
 
-  //for left side of the tree
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
-  TEST_ASSERT_EQUAL_PTR(node50,head->left->right);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left->right->left);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node10,head->left->left->left);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30   ,60    ,node90   ,node60);
+  TEST_ASSERT_ROOT(node20   ,30    ,node50   ,node30);
+  TEST_ASSERT_ROOT(node10   ,20    ,NULL     ,node20);
+  TEST_ASSERT_ROOT(NULL     ,10    ,NULL     ,node10);
+  TEST_ASSERT_ROOT(node40   ,50    ,NULL     ,node50);
+  TEST_ASSERT_ROOT(NULL     ,40    ,NULL     ,node40);
+  TEST_ASSERT_ROOT(node80   ,90    ,node140  ,node90);
+  TEST_ASSERT_ROOT(NULL     ,80    ,NULL     ,node80);
+  TEST_ASSERT_ROOT(node120  ,140   ,NULL     ,node140);
+  TEST_ASSERT_ROOT(NULL     ,120   ,NULL     ,node120);
 
-  //for right side of the tree
-  TEST_ASSERT_EQUAL_PTR(node90,head->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node140,head->right->right);
-  TEST_ASSERT_EQUAL_PTR(node120,head->right->right->left);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(1,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node30);
+  TEST_ASSERT_BALANCE(-1  ,node20);
+  TEST_ASSERT_BALANCE(0   ,node10);
+  TEST_ASSERT_BALANCE(-1  ,node50);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(1   ,node90);
+  TEST_ASSERT_BALANCE(0   ,node80);
+  TEST_ASSERT_BALANCE(-1  ,node140);
+  TEST_ASSERT_BALANCE(0   ,node120);
 }
 
 /**
@@ -470,19 +542,29 @@ void test_double_rotation_Balance_Factor_minus_2_1_1()
   avlAdd(&head,node30);
   avlAdd(&head,node80);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node50,head->left->right);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left->left->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,60    ,node100  ,node60);
+  TEST_ASSERT_ROOT(node20   ,40    ,node50   ,node40);
+  TEST_ASSERT_ROOT(NULL     ,20    ,node30   ,node20);
+  TEST_ASSERT_ROOT(NULL     ,30    ,NULL     ,node30);
+  TEST_ASSERT_ROOT(NULL     ,50    ,NULL     ,node50);
+  TEST_ASSERT_ROOT(node70   ,100   ,node110  ,node100);
+  TEST_ASSERT_ROOT(NULL     ,70    ,node80   ,node70);
+  TEST_ASSERT_ROOT(NULL     ,80    ,NULL     ,node80);
+  TEST_ASSERT_ROOT(NULL     ,110   ,node120  ,node110);
+  TEST_ASSERT_ROOT(NULL     ,120   ,NULL     ,node120);
 
-  TEST_ASSERT_EQUAL_PTR(node100,head->right);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node110,head->right->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left->right);
-  TEST_ASSERT_EQUAL_PTR(node120,head->right->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+  // test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(-1  ,node40);
+  TEST_ASSERT_BALANCE(1   ,node20);
+  TEST_ASSERT_BALANCE(0   ,node30);
+  TEST_ASSERT_BALANCE(0   ,node50);
+  TEST_ASSERT_BALANCE(0   ,node100);
+  TEST_ASSERT_BALANCE(1   ,node70);
+  TEST_ASSERT_BALANCE(0   ,node80);
+  TEST_ASSERT_BALANCE(1   ,node110);
+  TEST_ASSERT_BALANCE(0   ,node120);
 
 }
 
@@ -503,12 +585,15 @@ void test_double_rotation_Balance_Factor_2_0_minus_1()
   avlAdd(&head,node90);
   avlAdd(&head,node80);
 
-  TEST_ASSERT_EQUAL_PTR(node80,head);
-  TEST_ASSERT_EQUAL_PTR(node90,head->right);
-  TEST_ASSERT_EQUAL_PTR(node60,head->left);
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node60   ,80    ,node90  ,node80);
+  TEST_ASSERT_ROOT(NULL     ,60    ,NULL    ,node60);
+  TEST_ASSERT_ROOT(NULL     ,90    ,NULL    ,node90);
+
+  // test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node80);
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node90);
 }
 
 /**
@@ -527,12 +612,15 @@ void test_double_rotation_Balance_Factor_minus_2_0_1()
   avlAdd(&head,node40);
   avlAdd(&head,node50);
 
-  TEST_ASSERT_EQUAL_PTR(node50,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node60,head->right);
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,50    ,node60  ,node50);
+  TEST_ASSERT_ROOT(NULL     ,40    ,NULL    ,node40);
+  TEST_ASSERT_ROOT(NULL     ,60    ,NULL    ,node60);
+
+  // test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node50);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node60);
 
 }
 
@@ -556,14 +644,21 @@ void test_double_rotation_Balance_Factor_minus_2_1_minus_1()
   avlAdd(&head,node100);
   avlAdd(&head,node80);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30   ,60    ,node90  ,node60);
+  TEST_ASSERT_ROOT(node20   ,30    ,NULL    ,node30);
+  TEST_ASSERT_ROOT(NULL     ,20    ,NULL    ,node20);
+  TEST_ASSERT_ROOT(node80   ,90    ,node100 ,node90);
+  TEST_ASSERT_ROOT(NULL     ,80    ,NULL    ,node80);
+  TEST_ASSERT_ROOT(NULL     ,100   ,NULL    ,node100);
 
-  TEST_ASSERT_EQUAL_PTR(node90,head->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node100,head->right->right);
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+  // test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(-1  ,node30);
+  TEST_ASSERT_BALANCE(0   ,node20);
+  TEST_ASSERT_BALANCE(0   ,node90);
+  TEST_ASSERT_BALANCE(0   ,node80);
+  TEST_ASSERT_BALANCE(0   ,node100);
 }
 
 /**
@@ -586,15 +681,21 @@ void test_double_rotation_Balance_Factor_minus_2_minus_1_1()
   avlAdd(&head,node30);
   avlAdd(&head,node50);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node50,head->left->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,60    ,node90  ,node60);
+  TEST_ASSERT_ROOT(node30   ,40    ,node50  ,node40);
+  TEST_ASSERT_ROOT(NULL     ,30    ,NULL    ,node30);
+  TEST_ASSERT_ROOT(NULL     ,50    ,NULL    ,node50);
+  TEST_ASSERT_ROOT(NULL     ,90    ,node100 ,node90);
+  TEST_ASSERT_ROOT(NULL     ,100   ,NULL    ,node100);
 
-  TEST_ASSERT_EQUAL_PTR(node90,head->right);
-  TEST_ASSERT_EQUAL_PTR(node100,head->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
+  // test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node30);
+  TEST_ASSERT_BALANCE(0   ,node50);
+  TEST_ASSERT_BALANCE(1   ,node90);
+  TEST_ASSERT_BALANCE(0   ,node100);
 }
 
 
@@ -611,7 +712,7 @@ void test_double_rotation_Balance_Factor_minus_2_minus_1_1()
  *                        110  140
  *
  */
-void test_avlAdd_by_adding_more_data_data_to_the_avl_tree(void)
+void test_avlAdd_by_adding_more_data_to_the_avl_tree(void)
 {
   Node *head,*removeNode;
   int heightChange=0;
@@ -630,42 +731,46 @@ void test_avlAdd_by_adding_more_data_data_to_the_avl_tree(void)
   avlAdd(&head,node110);
   avlAdd(&head,node140);
 
-  TEST_ASSERT_EQUAL_PTR(node50,head);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30   ,50    ,node90  ,node50);
+  TEST_ASSERT_ROOT(node20   ,30    ,node40  ,node30);
+  TEST_ASSERT_ROOT(node10   ,20    ,NULL    ,node20);
+  TEST_ASSERT_ROOT(NULL     ,10    ,NULL    ,node10);
+  TEST_ASSERT_ROOT(NULL     ,40    ,NULL    ,node40);
+  TEST_ASSERT_ROOT(node80   ,90    ,node130 ,node90);
+  TEST_ASSERT_ROOT(node70   ,80    ,NULL    ,node80);
+  TEST_ASSERT_ROOT(NULL     ,70    ,NULL    ,node70);
+  TEST_ASSERT_ROOT(node100  ,130   ,node150 ,node130);
+  TEST_ASSERT_ROOT(NULL     ,100   ,node110 ,node100);
+  TEST_ASSERT_ROOT(node140  ,150   ,NULL    ,node150);
+  TEST_ASSERT_ROOT(NULL     ,140   ,NULL    ,node140);
+  TEST_ASSERT_ROOT(NULL     ,110   ,NULL    ,node110);
 
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left->right);
-  TEST_ASSERT_EQUAL_PTR(node10,head->left->left->left);
-
-  TEST_ASSERT_EQUAL_PTR(node90,head->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right->left->left);
-
-  TEST_ASSERT_EQUAL_PTR(node130,head->right->right);
-  TEST_ASSERT_EQUAL_PTR(node100,head->right->right->left);
-  TEST_ASSERT_EQUAL_PTR(node150,head->right->right->right);
-
-  TEST_ASSERT_EQUAL_PTR(node140,head->right->right->right->left);
-  TEST_ASSERT_EQUAL_PTR(node110,head->right->right->left->right);
-
-  TEST_ASSERT_EQUAL(1,head->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(1,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->right->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->right->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->right->right->right->balanceFactor);
-  TEST_ASSERT_EQUAL(1,head->right->right->left->balanceFactor);
+  // test balanceFactor
+  TEST_ASSERT_BALANCE(1   ,node50);
+  TEST_ASSERT_BALANCE(-1  ,node30);
+  TEST_ASSERT_BALANCE(-1  ,node20);
+  TEST_ASSERT_BALANCE(0   ,node10);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(1   ,node90);
+  TEST_ASSERT_BALANCE(-1  ,node80);
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(0   ,node130);
+  TEST_ASSERT_BALANCE(1   ,node100);
+  TEST_ASSERT_BALANCE(-1  ,node150);
+  TEST_ASSERT_BALANCE(0   ,node140);
+  TEST_ASSERT_BALANCE(0   ,node110);
 }
 
 /**
  *
- *                     50
- *                   /    \
- *                 30      90
- *                / \     / \
- *              20  40  80  130
- *             /       /       \
- *           10      70        150
+ *                     50                                50
+ *                   /    \                            /    \
+ *                 30      90                        30      90
+ *                / \     / \                       / \     / \
+ *              20  40  80  130         =>        20  40  80  140
+ *             /       /       \                 /       /    /  \
+ *           10      70        150             10      70   130  150
  *                             /
  *                            140
  *
@@ -687,24 +792,31 @@ void test_avlAdd_by_adding_more_data_data_to_the_avl_tree1(void)
   avlAdd(&head,node150);
   avlAdd(&head,node140);
 
-  TEST_ASSERT_EQUAL_PTR(node50,head);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30   ,50    ,node90  ,node50);
+  TEST_ASSERT_ROOT(node20   ,30    ,node40  ,node30);
+  TEST_ASSERT_ROOT(node10   ,20    ,NULL    ,node20);
+  TEST_ASSERT_ROOT(NULL     ,10    ,NULL    ,node10);
+  TEST_ASSERT_ROOT(NULL     ,40    ,NULL    ,node40);
+  TEST_ASSERT_ROOT(node80   ,90    ,node140 ,node90);
+  TEST_ASSERT_ROOT(node70   ,80    ,NULL    ,node80);
+  TEST_ASSERT_ROOT(NULL     ,70    ,NULL    ,node70);
+  TEST_ASSERT_ROOT(node130  ,140   ,node150 ,node140);
+  TEST_ASSERT_ROOT(NULL     ,150   ,NULL    ,node150);
+  TEST_ASSERT_ROOT(NULL     ,130   ,NULL    ,node130);
 
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left->right);
-  TEST_ASSERT_EQUAL_PTR(node10,head->left->left->left);
-
-  TEST_ASSERT_EQUAL_PTR(node90,head->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right->left->left);
-
-  TEST_ASSERT_EQUAL_PTR(node140,head->right->right);
-  TEST_ASSERT_EQUAL_PTR(node130,head->right->right->left);
-  TEST_ASSERT_EQUAL_PTR(node150,head->right->right->right);
-
-  // TEST_ASSERT_EQUAL_PTR(node140,head->right->right->right->left);
-  // TEST_ASSERT_EQUAL_PTR(node110,head->right->right->left->right);
-
+  // test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node50);
+  TEST_ASSERT_BALANCE(-1  ,node30);
+  TEST_ASSERT_BALANCE(-1  ,node20);
+  TEST_ASSERT_BALANCE(0   ,node10);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node90);
+  TEST_ASSERT_BALANCE(-1  ,node80);
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(0   ,node140);
+  TEST_ASSERT_BALANCE(0   ,node150);
+  TEST_ASSERT_BALANCE(0  ,node130);
 
 
 }

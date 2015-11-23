@@ -86,12 +86,12 @@ void checkForRotation(Node **rootPtr,int *heightChange){
       switch((*rootPtr)->balanceFactor){
         case 1:
           (*rootPtr)->balanceFactor=0;
-          (*rootPtr)->left->balanceFactor=0;
-          (*rootPtr)->right->balanceFactor=1;break;
-        case -1:
-          (*rootPtr)->balanceFactor=0;
           (*rootPtr)->left->balanceFactor=-1;
           (*rootPtr)->right->balanceFactor=0;break;
+        case -1:
+          (*rootPtr)->balanceFactor=0;
+          (*rootPtr)->left->balanceFactor=0;
+          (*rootPtr)->right->balanceFactor=1;break;
         default:
           (*rootPtr)->balanceFactor=0;
           (*rootPtr)->left->balanceFactor=0;

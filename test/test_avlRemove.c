@@ -5,6 +5,7 @@
 #include "ErrorObject.h"
 #include "CException.h"
 #include "avlRemove.h"
+#include "CustomAssertion.h"
 
 #include <stdlib.h>
 
@@ -66,6 +67,16 @@ void test_avlRemove_given_removing_node_not_in_tree_should_return_NULL(void)
   removeNode=avlRemove(&head,150,&heightChange);
 
   TEST_ASSERT_NULL(removeNode);
+
+  //test Node ptr
+  TEST_ASSERT_ROOT(node50   ,60   ,node100  ,node60);
+  TEST_ASSERT_ROOT(NULL     ,100  ,NULL     ,node100);
+  TEST_ASSERT_ROOT(NULL     ,50   ,NULL     ,node50);
+
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node100);
+  TEST_ASSERT_BALANCE(0   ,node50);
 }
 
 /**
@@ -86,12 +97,80 @@ void test_avlRemove_when_removing_right_node_balance_Factor_should_subtract_1(vo
 
   TEST_ASSERT_EQUAL_PTR(node100,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_NULL(head->right);
-  TEST_ASSERT_EQUAL_PTR(node50,head->left);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node50   ,60   ,NULL   ,node60);
+  TEST_ASSERT_ROOT(NULL     ,50   ,NULL   ,node50);
 
-  TEST_ASSERT_EQUAL(-1,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(-1  ,node60);
+  TEST_ASSERT_BALANCE(0   ,node50);
+}
+
+/**
+ *        60                               60
+ *       /  \        (remove 110)         /  \
+ *     50    100          =>            50   100
+ *           / \                             /
+ *         90  110                         90
+ */
+void test_avlRemove_removing_right_node_at_the_child_with_condition_height_no_change_but_current_Balance_change(void)
+{
+  Node *head,*removeNode;
+  int heightChange=0;
+
+  head=node60;
+  avlAdd(&head,node50);
+  avlAdd(&head,node100);
+  avlAdd(&head,node110);
+  avlAdd(&head,node90);
+
+  removeNode=avlRemove(&head,110,&heightChange);
+
+  TEST_ASSERT_EQUAL_PTR(node110,removeNode);
+
+  //test Node ptr
+  TEST_ASSERT_ROOT(node50   ,60   ,node100  ,node60);
+  TEST_ASSERT_ROOT(NULL     ,50   ,NULL     ,node50);
+  TEST_ASSERT_ROOT(node90   ,100  ,NULL     ,node100);
+  TEST_ASSERT_ROOT(NULL     ,90   ,NULL     ,node90);
+
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(1   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node50);
+  TEST_ASSERT_BALANCE(-1  ,node100);
+  TEST_ASSERT_BALANCE(0   ,node90);
+}
+
+/**
+ *        60                                 60
+ *       /  \            (remove 110)       /  \
+ *     50    100              =>          50   100
+ *            \
+ *            110
+ */
+void test_avlRemove_removing_right_node_at_the_child_with_condition_height_change_and_current_Balance_change(void)
+{
+  Node *head,*removeNode;
+  int heightChange=0;
+
+  head=node60;
+  avlAdd(&head,node50);
+  avlAdd(&head,node100);
+  avlAdd(&head,node110);
+
+  removeNode=avlRemove(&head,110,&heightChange);
+
+  TEST_ASSERT_EQUAL_PTR(node110,removeNode);
+
+  //test Node ptr
+  TEST_ASSERT_ROOT(node50   ,60   ,node100  ,node60);
+  TEST_ASSERT_ROOT(NULL     ,100  ,NULL     ,node100);
+  TEST_ASSERT_ROOT(NULL     ,50   ,NULL     ,node50);
+
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node100);
+  TEST_ASSERT_BALANCE(0   ,node50);
 }
 
 /**
@@ -112,117 +191,13 @@ void test_avlRemove_when_removing_left_node_balance_Factor_should_add_1(void)
 
   TEST_ASSERT_EQUAL_PTR(node50,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_NULL(head->left);
-  TEST_ASSERT_EQUAL_PTR(node100,head->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(NULL   ,60   ,node100  ,node60);
+  TEST_ASSERT_ROOT(NULL   ,100  ,NULL     ,node100);
 
-  TEST_ASSERT_EQUAL(1,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-}
-
-/**
- *        60                                 60
- *       /  \            (remove 110)       /  \
- *     50    100              =>          50   100
- *            \
- *            110
- */
-void test_avlRemove_given_height_changing_and_balance_Factor_of_the_child_changing_by_minus_1(void)
-{
-  Node *head,*removeNode;
-  int heightChange=0;
-
-  head=node60;
-  avlAdd(&head,node50);
-  avlAdd(&head,node100);
-  avlAdd(&head,node110);
-
-  removeNode=avlRemove(&head,110,&heightChange);
-
-  TEST_ASSERT_EQUAL_PTR(node110,removeNode);
-
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node50,head->left);
-  TEST_ASSERT_EQUAL_PTR(node100,head->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
-}
-
-
-/**
- *        60                           60
- *       /  \      (remove 90)        /  \
- *     50    100        =>          50   100
- *           /
- *         90
- */
-void test_avlRemove_given_height_changing_and_balance_Factor_of_the_child_changing_by_plus_1(void)
-{
-  Node *head,*removeNode;
-  int heightChange=0;
-
-  head=node60;
-  avlAdd(&head,node50);
-  avlAdd(&head,node100);
-  avlAdd(&head,node90);
-
-  removeNode=avlRemove(&head,90,&heightChange);
-
-  TEST_ASSERT_EQUAL_PTR(node90,removeNode);
-
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node50,head->left);
-  TEST_ASSERT_EQUAL_PTR(node100,head->right);
-
-  TEST_ASSERT_NULL(head->right->right);
-  TEST_ASSERT_NULL(head->right->left);
-
-  TEST_ASSERT_NULL(head->left->right);
-  TEST_ASSERT_NULL(head->left->left);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
-}
-
-
-/**
- *        60                               60
- *       /  \        (remove 110)         /  \
- *     50    100          =>            50   100
- *           / \                             /
- *         90  110                         90
- */
-void test_avlRemove_given_height_not_changing_and_balance_Factor_of_the_child_changing_by_minus_1(void)
-{
-  Node *head,*removeNode;
-  int heightChange=0;
-
-  head=node60;
-  avlAdd(&head,node50);
-  avlAdd(&head,node100);
-  avlAdd(&head,node110);
-  avlAdd(&head,node90);
-
-  removeNode=avlRemove(&head,110,&heightChange);
-
-  TEST_ASSERT_EQUAL_PTR(node110,removeNode);
-
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node50,head->left);
-  TEST_ASSERT_NULL(head->left->left);
-  TEST_ASSERT_NULL(head->left->right);
-
-  TEST_ASSERT_EQUAL_PTR(node100,head->right);
-  TEST_ASSERT_EQUAL_PTR(node90,head->right->left);
-  TEST_ASSERT_NULL(head->right->right);
-
-  TEST_ASSERT_EQUAL(1,head->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(1   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node100);
 }
 
 /**
@@ -232,7 +207,7 @@ void test_avlRemove_given_height_not_changing_and_balance_Factor_of_the_child_ch
  *           / \                              \
  *         90  110                            110
  */
-void test_avlRemove_given_height_not_changing_and_balance_Factor_of_the_child_changing_by_plus_1(void)
+void test_avlRemove_removing_left_node_at_the_child_with_condition_height_no_change_but_current_Balance_change(void)
 {
   Node *head,*removeNode;
   int heightChange=0;
@@ -247,18 +222,49 @@ void test_avlRemove_given_height_not_changing_and_balance_Factor_of_the_child_ch
 
   TEST_ASSERT_EQUAL_PTR(node90,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node50,head->left);
-  TEST_ASSERT_NULL(head->left->left);
-  TEST_ASSERT_NULL(head->left->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node50   ,60   ,node100  ,node60);
+  TEST_ASSERT_ROOT(NULL     ,50   ,NULL     ,node50);
+  TEST_ASSERT_ROOT(NULL     ,100  ,node110  ,node100);
+  TEST_ASSERT_ROOT(NULL     ,110  ,NULL     ,node110);
 
-  TEST_ASSERT_EQUAL_PTR(node100,head->right);
-  TEST_ASSERT_EQUAL_PTR(node110,head->right->right);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(1   ,node60);
+  TEST_ASSERT_BALANCE(1   ,node100);
+  TEST_ASSERT_BALANCE(0   ,node50);
+  TEST_ASSERT_BALANCE(0   ,node110);
+}
 
-  TEST_ASSERT_EQUAL(1,head->balanceFactor);
-  TEST_ASSERT_EQUAL(1,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
+/**
+ *        60                           60
+ *       /  \      (remove 90)        /  \
+ *     50    100        =>          50   100
+ *           /
+ *         90
+ */
+void test_avlRemove_removing_left_node_at_the_child_with_condition_height_change_and_current_Balance_change(void)
+{
+  Node *head,*removeNode;
+  int heightChange=0;
+
+  head=node60;
+  avlAdd(&head,node50);
+  avlAdd(&head,node100);
+  avlAdd(&head,node90);
+
+  removeNode=avlRemove(&head,90,&heightChange);
+
+  TEST_ASSERT_EQUAL_PTR(node90,removeNode);
+
+  //test Node ptr
+  TEST_ASSERT_ROOT(node50   ,60   ,node100  ,node60);
+  TEST_ASSERT_ROOT(NULL     ,100  ,NULL     ,node100);
+  TEST_ASSERT_ROOT(NULL     ,50   ,NULL     ,node50);
+
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node100);
+  TEST_ASSERT_BALANCE(0   ,node50);
 }
 
 /**
@@ -268,7 +274,7 @@ void test_avlRemove_given_height_not_changing_and_balance_Factor_of_the_child_ch
  *                  \
  *                  80
  */
-void test_avlRemove_given_after_removing_the_condition_is_2_0_1_should_do_left_rotation(void)
+void test_avlRemove_removing_left_node_given_after_removing_the_condition_is_2_0_1_should_do_left_rotation(void)
 {
   Node *head,*removeNode;
   int heightChange=0;
@@ -282,18 +288,15 @@ void test_avlRemove_given_after_removing_the_condition_is_2_0_1_should_do_left_r
 
   TEST_ASSERT_EQUAL_PTR(node40,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node70,head);
-  TEST_ASSERT_EQUAL_PTR(node60,head->left);
-  TEST_ASSERT_NULL(head->left->left);
-  TEST_ASSERT_NULL(head->left->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node60   ,70   ,node80   ,node70);
+  TEST_ASSERT_ROOT(NULL     ,60   ,NULL     ,node60);
+  TEST_ASSERT_ROOT(NULL     ,80   ,NULL     ,node80);
 
-  TEST_ASSERT_EQUAL_PTR(node80,head->right);
-  TEST_ASSERT_NULL(head->right->left);
-  TEST_ASSERT_NULL(head->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node80);
 }
 
 /**
@@ -303,7 +306,7 @@ void test_avlRemove_given_after_removing_the_condition_is_2_0_1_should_do_left_r
  *                /
  *              70
  */
-void test_avlRemove_given_after_removing_the_condition_is_2_0_minus_1_should_do_right_left_rotation(void)
+void test_avlRemove_removing_left_node_given_after_removing_the_condition_is_2_0_minus_1_should_do_right_left_rotation(void)
 {
   Node *head,*removeNode;
   int heightChange=0;
@@ -317,18 +320,15 @@ void test_avlRemove_given_after_removing_the_condition_is_2_0_minus_1_should_do_
 
   TEST_ASSERT_EQUAL_PTR(node40,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node70,head);
-  TEST_ASSERT_EQUAL_PTR(node60,head->left);
-  TEST_ASSERT_NULL(head->left->left);
-  TEST_ASSERT_NULL(head->left->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node60   ,70   ,node80   ,node70);
+  TEST_ASSERT_ROOT(NULL     ,60   ,NULL     ,node60);
+  TEST_ASSERT_ROOT(NULL     ,80   ,NULL     ,node80);
 
-  TEST_ASSERT_EQUAL_PTR(node80,head->right);
-  TEST_ASSERT_NULL(head->right->left);
-  TEST_ASSERT_NULL(head->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node80);
 }
 
 /**
@@ -340,7 +340,7 @@ void test_avlRemove_given_after_removing_the_condition_is_2_0_minus_1_should_do_
  *                     \
  *                     100
  */
-void test_avlRemove_after_removing_the_condition_is_2_0_1_at_right_child_should_do_left_rotation_at_right_child(void)
+void test_avlRemove_removing_left_node_at_child_given_after_removing_the_condition_is_2_0_1_at_right_child_should_do_left_rotation_at_right_child(void)
 {
   Node *head,*removeNode;
   int heightChange=0;
@@ -357,18 +357,21 @@ void test_avlRemove_after_removing_the_condition_is_2_0_1_at_right_child_should_
 
   TEST_ASSERT_EQUAL_PTR(node70,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left->left);
-  TEST_ASSERT_NULL(head->left->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,60   ,node90   ,node60);
+  TEST_ASSERT_ROOT(node30   ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(NULL     ,30   ,NULL     ,node30);
+  TEST_ASSERT_ROOT(node80   ,90   ,node100  ,node90);
+  TEST_ASSERT_ROOT(NULL     ,80   ,NULL     ,node80);
+  TEST_ASSERT_ROOT(NULL     ,100  ,NULL     ,node100);
 
-  TEST_ASSERT_EQUAL_PTR(node90,head->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node100,head->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->left->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(-1  ,node40);
+  TEST_ASSERT_BALANCE(0   ,node30);
+  TEST_ASSERT_BALANCE(0   ,node90);
+  TEST_ASSERT_BALANCE(0   ,node80);
+  TEST_ASSERT_BALANCE(0   ,node100);
 }
 
 /**
@@ -397,18 +400,21 @@ void test_avlRemove_removing_right_child_if_balance_should_return_removed_node(v
 
   TEST_ASSERT_EQUAL_PTR(node100,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left->left);
-  TEST_ASSERT_NULL(head->left->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,60   ,node80   ,node60);
+  TEST_ASSERT_ROOT(node30   ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(NULL     ,30   ,NULL     ,node30);
+  TEST_ASSERT_ROOT(node70   ,80   ,node90   ,node80);
+  TEST_ASSERT_ROOT(NULL     ,70   ,NULL     ,node70);
+  TEST_ASSERT_ROOT(NULL     ,90   ,NULL     ,node90);
 
-  TEST_ASSERT_EQUAL_PTR(node80,head->right);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node90,head->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->left->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(-1  ,node40);
+  TEST_ASSERT_BALANCE(0   ,node30);
+  TEST_ASSERT_BALANCE(0   ,node80);
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(0   ,node90);
 }
 
 /**
@@ -434,13 +440,15 @@ void test_avlRemove_removing_intermidiate_left_child_if_right_node_equal_NULL_sh
 
   TEST_ASSERT_EQUAL_PTR(node50,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,60   ,node70   ,node60);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(NULL     ,70   ,NULL     ,node70);
 
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node70);
 }
 
 /**
@@ -466,13 +474,15 @@ void test_avlRemove_removing_intermidiate_left_child_if_left_node_equal_NULL_sho
 
   TEST_ASSERT_EQUAL_PTR(node40,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node50,head->left);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node50   ,60   ,node70   ,node60);
+  TEST_ASSERT_ROOT(NULL     ,50   ,NULL     ,node50);
+  TEST_ASSERT_ROOT(NULL     ,70   ,NULL     ,node70);
 
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node50);
+  TEST_ASSERT_BALANCE(0   ,node70);
 }
 
 /**
@@ -498,13 +508,15 @@ void test_avlRemove_removing_intermidiate_right_child_if_left_node_equal_NULL_sh
 
   TEST_ASSERT_EQUAL_PTR(node70,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,60   ,node80   ,node60);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(NULL     ,80   ,NULL     ,node80);
 
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node80);
 }
 
 /**
@@ -529,13 +541,15 @@ void test_avlRemove_removing_intermidiate_right_child_if_right_node_equal_NULL_s
 
   TEST_ASSERT_EQUAL_PTR(node80,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node60,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,60   ,node70   ,node60);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(NULL     ,70   ,NULL     ,node70);
 
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node60);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node70);
 }
 
 /**
@@ -560,18 +574,15 @@ void test_avlRemove_1(void)
 
   TEST_ASSERT_EQUAL_PTR(node60,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node70,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_NULL(head->left->right);
-  TEST_ASSERT_NULL(head->left->left);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,70   ,node80   ,node70);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(NULL     ,80   ,NULL     ,node80);
 
-  TEST_ASSERT_EQUAL_PTR(node80,head->right);
-  TEST_ASSERT_NULL(head->right->left);
-  TEST_ASSERT_NULL(head->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node80);
 }
 
 /**
@@ -595,12 +606,13 @@ void test_avlRemove_2(void)
 
   TEST_ASSERT_EQUAL_PTR(node60,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node80,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_NULL(head->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,80   ,NULL   ,node80);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL   ,node40);
 
-  TEST_ASSERT_EQUAL(-1,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(-1  ,node80);
+  TEST_ASSERT_BALANCE(0   ,node40);
 }
 
 /**
@@ -625,13 +637,15 @@ void test_avlRemove_3(void)
 
   TEST_ASSERT_EQUAL_PTR(node60,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node80,head);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left);
-  TEST_ASSERT_EQUAL_PTR(node90,head->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node40   ,80   ,node90 ,node80);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL   ,node40);
+  TEST_ASSERT_ROOT(NULL     ,90   ,NULL   ,node90);
 
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node80);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node90);
 }
 
 /**
@@ -669,26 +683,31 @@ void test_avlRemove_4(void)
 
   TEST_ASSERT_EQUAL_PTR(node110,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node50,head);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30   ,50   ,node90   ,node50);
+  TEST_ASSERT_ROOT(node20   ,30   ,node40   ,node30);
+  TEST_ASSERT_ROOT(node10   ,20   ,NULL     ,node20);
+  TEST_ASSERT_ROOT(NULL     ,10   ,NULL     ,node10);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(node80   ,90   ,node120  ,node90);
+  TEST_ASSERT_ROOT(node70   ,80   ,NULL     ,node80);
+  TEST_ASSERT_ROOT(NULL     ,70   ,NULL     ,node70);
+  TEST_ASSERT_ROOT(node100  ,120  ,node130  ,node120);
+  TEST_ASSERT_ROOT(NULL     ,130  ,NULL     ,node130);
+  TEST_ASSERT_ROOT(NULL     ,100  ,NULL     ,node100);
 
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left->right);
-  TEST_ASSERT_EQUAL_PTR(node10,head->left->left->left);
-
-  TEST_ASSERT_EQUAL_PTR(node90,head->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right->left->left);
-
-  TEST_ASSERT_EQUAL_PTR(node120,head->right->right);
-  TEST_ASSERT_EQUAL_PTR(node100,head->right->right->left);
-  TEST_ASSERT_EQUAL_PTR(node130,head->right->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->right->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->right->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node50);
+  TEST_ASSERT_BALANCE(-1  ,node30);
+  TEST_ASSERT_BALANCE(-1  ,node20);
+  TEST_ASSERT_BALANCE(0   ,node10);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node90);
+  TEST_ASSERT_BALANCE(-1  ,node80);
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(0   ,node120);
+  TEST_ASSERT_BALANCE(0   ,node130);
+  TEST_ASSERT_BALANCE(0   ,node100);
 }
 
 /**
@@ -726,26 +745,31 @@ void test_avlRemove_5(void)
 
   TEST_ASSERT_EQUAL_PTR(node50,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node70,head);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left->right);
-  TEST_ASSERT_EQUAL_PTR(node10,head->left->left->left);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30   ,70   ,node110  ,node70);
+  TEST_ASSERT_ROOT(node20   ,30   ,node40   ,node30);
+  TEST_ASSERT_ROOT(node10   ,20   ,NULL     ,node20);
+  TEST_ASSERT_ROOT(NULL     ,10   ,NULL     ,node10);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(node90   ,110  ,node130  ,node110);
+  TEST_ASSERT_ROOT(node80   ,90   ,node100  ,node90);
+  TEST_ASSERT_ROOT(NULL     ,80   ,NULL     ,node80);
+  TEST_ASSERT_ROOT(NULL     ,100  ,NULL     ,node100);
+  TEST_ASSERT_ROOT(node120  ,130  ,NULL     ,node130);
+  TEST_ASSERT_ROOT(NULL     ,120  ,NULL     ,node120);
 
-  TEST_ASSERT_EQUAL_PTR(node110,head->right);
-  TEST_ASSERT_EQUAL_PTR(node90,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left->left);
-  TEST_ASSERT_EQUAL_PTR(node100,head->right->left->right);
-
-  TEST_ASSERT_EQUAL_PTR(node130,head->right->right);
-  TEST_ASSERT_EQUAL_PTR(node120,head->right->right->left);
-  TEST_ASSERT_NULL(head->right->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->right->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->left->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(-1  ,node30);
+  TEST_ASSERT_BALANCE(-1  ,node20);
+  TEST_ASSERT_BALANCE(0   ,node10);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node110);
+  TEST_ASSERT_BALANCE(0   ,node90);
+  TEST_ASSERT_BALANCE(0   ,node80);
+  TEST_ASSERT_BALANCE(0   ,node100);
+  TEST_ASSERT_BALANCE(-1  ,node130);
+  TEST_ASSERT_BALANCE(0   ,node120);
 }
 
 /**
@@ -776,26 +800,23 @@ void test_avlRemove_6(void)
 
   TEST_ASSERT_EQUAL_PTR(node50,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node70,head);
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left->right);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30   ,70   ,node90   ,node70);
+  TEST_ASSERT_ROOT(node20   ,30   ,node40   ,node30);
+  TEST_ASSERT_ROOT(NULL     ,20   ,NULL     ,node20);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(node80   ,90   ,node110  ,node90);
+  TEST_ASSERT_ROOT(NULL     ,110  ,NULL     ,node110);
+  TEST_ASSERT_ROOT(NULL     ,80   ,NULL     ,node80);
 
-  TEST_ASSERT_EQUAL_PTR(node90,head->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
-  TEST_ASSERT_NULL(head->right->left->left);
-  TEST_ASSERT_NULL(head->right->left->right);
-  TEST_ASSERT_EQUAL_PTR(node110,head->right->right);
-  TEST_ASSERT_NULL(head->right->right->left);
-  TEST_ASSERT_NULL(head->right->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->right->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->left->right->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(0   ,node30);
+  TEST_ASSERT_BALANCE(0   ,node20);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node90);
+  TEST_ASSERT_BALANCE(0   ,node110);
+  TEST_ASSERT_BALANCE(0   ,node80);
 }
 
 /**
@@ -833,26 +854,31 @@ void test_avlRemove_7(void)
 
   TEST_ASSERT_EQUAL_PTR(node90,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node50,head);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30   ,50   ,node100  ,node50);
+  TEST_ASSERT_ROOT(node20   ,30   ,node40   ,node30);
+  TEST_ASSERT_ROOT(node10   ,20   ,NULL     ,node20);
+  TEST_ASSERT_ROOT(NULL     ,10   ,NULL     ,node10);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(node80   ,100  ,node120  ,node100);
+  TEST_ASSERT_ROOT(node70   ,80   ,NULL     ,node80);
+  TEST_ASSERT_ROOT(NULL     ,70   ,NULL     ,node70);
+  TEST_ASSERT_ROOT(node110  ,120  ,node130  ,node120);
+  TEST_ASSERT_ROOT(NULL     ,110  ,NULL     ,node110);
+  TEST_ASSERT_ROOT(NULL     ,130  ,NULL     ,node130);
 
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left->right);
-  TEST_ASSERT_EQUAL_PTR(node10,head->left->left->left);
-
-  TEST_ASSERT_EQUAL_PTR(node100,head->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right->left->left);
-
-  TEST_ASSERT_EQUAL_PTR(node120,head->right->right);
-  TEST_ASSERT_EQUAL_PTR(node110,head->right->right->left);
-  TEST_ASSERT_EQUAL_PTR(node130,head->right->right->right);
-
-  TEST_ASSERT_EQUAL(0,head->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->right->left->balanceFactor);
-  TEST_ASSERT_EQUAL(0,head->right->right->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(0   ,node50);
+  TEST_ASSERT_BALANCE(-1  ,node30);
+  TEST_ASSERT_BALANCE(-1  ,node20);
+  TEST_ASSERT_BALANCE(0   ,node10);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(0   ,node100);
+  TEST_ASSERT_BALANCE(-1  ,node80);
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(0   ,node120);
+  TEST_ASSERT_BALANCE(0   ,node110);
+  TEST_ASSERT_BALANCE(0   ,node130);
 }
 
 /**
@@ -891,33 +917,31 @@ void test_avlRemove_8(void)
 
   TEST_ASSERT_EQUAL_PTR(node90,removeNode);
 
-  TEST_ASSERT_EQUAL_PTR(node50,head);
+  //test Node ptr
+  TEST_ASSERT_ROOT(node30   ,50   ,node100  ,node50);
+  TEST_ASSERT_ROOT(node20   ,30   ,node40   ,node30);
+  TEST_ASSERT_ROOT(node10   ,20   ,NULL     ,node20);
+  TEST_ASSERT_ROOT(NULL     ,10   ,NULL     ,node10);
+  TEST_ASSERT_ROOT(NULL     ,40   ,NULL     ,node40);
+  TEST_ASSERT_ROOT(node80   ,100  ,node130  ,node100);
+  TEST_ASSERT_ROOT(node70   ,80   ,NULL     ,node80);
+  TEST_ASSERT_ROOT(NULL     ,70   ,NULL     ,node70);
+  TEST_ASSERT_ROOT(node110  ,130  ,node150  ,node130);
+  TEST_ASSERT_ROOT(node140  ,150  ,NULL     ,node150);
+  TEST_ASSERT_ROOT(NULL     ,140  ,NULL     ,node140);
 
-  TEST_ASSERT_EQUAL_PTR(node30,head->left);
-  TEST_ASSERT_EQUAL_PTR(node20,head->left->left);
-  TEST_ASSERT_EQUAL_PTR(node40,head->left->right);
-  TEST_ASSERT_EQUAL_PTR(node10,head->left->left->left);
-
-  TEST_ASSERT_EQUAL_PTR(node100,head->right);
-  TEST_ASSERT_EQUAL_PTR(node80,head->right->left);
-  TEST_ASSERT_EQUAL_PTR(node70,head->right->left->left);
-
-  TEST_ASSERT_EQUAL_PTR(node130,head->right->right);
-  TEST_ASSERT_EQUAL_PTR(node110,head->right->right->left);
-  TEST_ASSERT_NULL(head->right->right->left->left);
-  TEST_ASSERT_NULL(head->right->right->left->right);
-  TEST_ASSERT_EQUAL_PTR(node150,head->right->right->right);
-
-  TEST_ASSERT_EQUAL_PTR(node140,head->right->right->right->left);
-  TEST_ASSERT_NULL(head->right->right->right->right);
-
-  TEST_ASSERT_EQUAL(1,head->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->left->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->left->left->balanceFactor);
-  TEST_ASSERT_EQUAL(1,head->right->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->right->left->balanceFactor);
-  TEST_ASSERT_EQUAL(1,head->right->right->balanceFactor);
-  TEST_ASSERT_EQUAL(-1,head->right->right->right->balanceFactor);
+  //test balanceFactor
+  TEST_ASSERT_BALANCE(1   ,node50);
+  TEST_ASSERT_BALANCE(-1  ,node30);
+  TEST_ASSERT_BALANCE(-1  ,node20);
+  TEST_ASSERT_BALANCE(0   ,node10);
+  TEST_ASSERT_BALANCE(0   ,node40);
+  TEST_ASSERT_BALANCE(1   ,node100);
+  TEST_ASSERT_BALANCE(-1  ,node80);
+  TEST_ASSERT_BALANCE(0   ,node70);
+  TEST_ASSERT_BALANCE(1   ,node130);
+  TEST_ASSERT_BALANCE(-1   ,node150);
+  TEST_ASSERT_BALANCE(0   ,node140);
 
 }
 

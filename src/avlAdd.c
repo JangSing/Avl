@@ -14,8 +14,6 @@ int avlAdd(Node **rootPtr,Node *newNode){
       change=avlAdd(&((*rootPtr)->right) , newNode);
       if(change && (*rootPtr)->right->balanceFactor!=balanceBefore)
         (*rootPtr)->balanceFactor++;
-      // Rotation Task starts here
-      checkForRotation(rootPtr,NULL);
     }
     else{
       (*rootPtr)->right=newNode;
@@ -32,8 +30,6 @@ int avlAdd(Node **rootPtr,Node *newNode){
       change=avlAdd(&((*rootPtr)->left) , newNode);
       if(change && (*rootPtr)->left->balanceFactor!=balanceBefore)
         (*rootPtr)->balanceFactor--;
-      // Rotation Task starts here
-      checkForRotation(rootPtr,NULL);
     }
     else{
       (*rootPtr)->left=newNode;
@@ -46,9 +42,10 @@ int avlAdd(Node **rootPtr,Node *newNode){
   }
   else
     throwError(ERR_REPEATED_NODE,"The node added has already in the avl tree");
-
-
-
+  
+  // Rotation Task starts here
+  checkForRotation(rootPtr,NULL);
+  
   return (*rootPtr)->balanceFactor;
 }
 
